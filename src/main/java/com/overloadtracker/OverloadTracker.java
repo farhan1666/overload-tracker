@@ -5,6 +5,7 @@ import net.runelite.client.ui.overlay.infobox.Counter;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.nio.Buffer;
 
 class OverloadTracker extends Counter
 {
@@ -15,6 +16,8 @@ class OverloadTracker extends Counter
 
     private Color textColor;
 
+    private BufferedImage image;
+
     @Override
     public Color getTextColor() {
         return this.textColor;
@@ -23,4 +26,5 @@ class OverloadTracker extends Counter
     public void setTextColor(Color color) {
         this.textColor = color;
     }
+
 }

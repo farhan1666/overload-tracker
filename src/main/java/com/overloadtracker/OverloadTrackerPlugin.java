@@ -5,10 +5,7 @@ import javax.inject.Inject;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
-import net.runelite.api.events.ChatMessage;
-import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.events.VarbitChanged;
+import net.runelite.api.events.*;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
@@ -17,6 +14,7 @@ import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.awt.*;
+import java.util.HashMap;
 
 @Slf4j
 @PluginDescriptor(
@@ -33,6 +31,9 @@ public class OverloadTrackerPlugin extends Plugin
 
 	@Inject
 	private InfoBoxManager infoBoxManager;
+
+	private HashMap<Skill, Integer> skills;
+	private HashMap<Skill, Integer> boostedSkills;
 
 	private static int OVERLOAD_REFRESH_RATE = 25;
 	private static final int NMZ_MAP_REGION_ID = 9033;
@@ -95,29 +96,43 @@ public class OverloadTrackerPlugin extends Plugin
 	{
 		if (currentTick != -1)
 		{
-			if (currentTick > 1)
+			if (counter != null)
 			{
-				currentTick--;
-			}
-			else
-			{
-				currentTick = OVERLOAD_REFRESH_RATE;
-				counter.setTextColor(Color.WHITE);
-			}
-			if (currentTick < 4 && currentTick > 1)
-			{
-				counter.setTextColor(Color.YELLOW);
-			}
-			if (currentTick == 1)
-			{
-				counter.setImage(itemManager.getImage(6684));
-				counter.setTextColor(Color.RED);
+				if (currentTick > 1) {
+					currentTick--;
+				} else {
+					currentTick = OVERLOAD_REFRESH_RATE;
+					counter.setTextColor(Color.WHITE);
+					counter.setImage(itemManager.getImage(ItemID.OVERLOAD_4_20996));
+					infoBoxManager.updateInfoBoxImage(counter);
+				}
+				if (currentTick < 5 && currentTick > 1) {
+					counter.setTextColor(Color.YELLOW);
+				}
+				if (currentTick == 1) {
+					counter.setImage(itemManager.getImage(ItemID.SARADOMIN_BREW4));
+					infoBoxManager.updateInfoBoxImage(counter);
+					counter.setTextColor(Color.RED);
+				}
 			}
 		}
 		if (counter != null)
 		{
 			counter.setCount(currentTick);
 		}
+		skills.put(Skill.ATTACK, client.getRealSkillLevel(Skill.ATTACK));
+		skills.put(Skill.STRENGTH, client.getRealSkillLevel(Skill.STRENGTH));
+		skills.put(Skill.DEFENCE, client.getRealSkillLevel(Skill.DEFENCE));
+		skills.put(Skill.MAGIC, client.getRealSkillLevel(Skill.MAGIC));
+		skills.put(Skill.RANGED, client.getRealSkillLevel(Skill.RANGED));
+		
+		boostedSkills.put(Skill.ATTACK, client.getBoostedSkillLevel(Skill.ATTACK));
+		boostedSkills.put(Skill.STRENGTH, client.getBoostedSkillLevel(Skill.STRENGTH));
+		boostedSkills.put(Skill.DEFENCE, client.getBoostedSkillLevel(Skill.DEFENCE));
+		boostedSkills.put(Skill.MAGIC, client.getBoostedSkillLevel(Skill.MAGIC));
+		boostedSkills.put(Skill.RANGED, client.getBoostedSkillLevel(Skill.RANGED));
+
+
 	}
 
 	private void createOverloadTracker()
