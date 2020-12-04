@@ -33,7 +33,9 @@ public class OverloadTrackerPlugin extends Plugin
 	private InfoBoxManager infoBoxManager;
 
 	private HashMap<Skill, Integer> skills;
-	private HashMap<Skill, Integer> boostedSkills;
+	private HashMap<Skill, Integer> skills1;
+	private HashMap<Skill, Integer> skills2;
+	private boolean flipFlop = true;
 
 	private static int OVERLOAD_REFRESH_RATE = 25;
 	private static final int NMZ_MAP_REGION_ID = 9033;
@@ -94,6 +96,8 @@ public class OverloadTrackerPlugin extends Plugin
 	@Subscribe
 	public void onGameTick(GameTick event)
 	{
+		flipFlop = !flipFlop;
+		int skillDiff = 0;
 		if (currentTick != -1)
 		{
 			if (counter != null)
@@ -110,7 +114,7 @@ public class OverloadTrackerPlugin extends Plugin
 					counter.setTextColor(Color.YELLOW);
 				}
 				if (currentTick == 1) {
-					counter.setImage(itemManager.getImage(ItemID.SARADOMIN_BREW4));
+					counter.setImage(itemManager.getImage(ItemID.XERICS_AID_4));
 					infoBoxManager.updateInfoBoxImage(counter);
 					counter.setTextColor(Color.RED);
 				}
@@ -120,17 +124,34 @@ public class OverloadTrackerPlugin extends Plugin
 		{
 			counter.setCount(currentTick);
 		}
-		skills.put(Skill.ATTACK, client.getRealSkillLevel(Skill.ATTACK));
-		skills.put(Skill.STRENGTH, client.getRealSkillLevel(Skill.STRENGTH));
-		skills.put(Skill.DEFENCE, client.getRealSkillLevel(Skill.DEFENCE));
-		skills.put(Skill.MAGIC, client.getRealSkillLevel(Skill.MAGIC));
-		skills.put(Skill.RANGED, client.getRealSkillLevel(Skill.RANGED));
-		
-		boostedSkills.put(Skill.ATTACK, client.getBoostedSkillLevel(Skill.ATTACK));
-		boostedSkills.put(Skill.STRENGTH, client.getBoostedSkillLevel(Skill.STRENGTH));
-		boostedSkills.put(Skill.DEFENCE, client.getBoostedSkillLevel(Skill.DEFENCE));
-		boostedSkills.put(Skill.MAGIC, client.getBoostedSkillLevel(Skill.MAGIC));
-		boostedSkills.put(Skill.RANGED, client.getBoostedSkillLevel(Skill.RANGED));
+
+
+
+		if (counter != null)
+		{
+			skills.put(Skill.STRENGTH, client.getRealSkillLevel(Skill.STRENGTH));
+			skills.put(Skill.RANGED, client.getRealSkillLevel(Skill.RANGED));
+
+			if (flipFlop)
+			{
+				skills1.put(Skill.STRENGTH, client.getBoostedSkillLevel(Skill.STRENGTH));
+				skills1.put(Skill.RANGED, client.getBoostedSkillLevel(Skill.RANGED));
+			}
+			else if (!flipFlop)
+			{
+				skills2.put(Skill.STRENGTH, client.getBoostedSkillLevel(Skill.STRENGTH));
+				skills2.put(Skill.RANGED, client.getBoostedSkillLevel(Skill.RANGED));
+			}
+
+			if (!flipFlop)
+			{
+				if (skills2.get(Skill.STRENGTH) != skills1.get(Skill.STRENGTH))
+				{
+					skillDiff = skills2.get(Skill.STRENGTH) - skills1.get(Skill.STRENGTH);
+				}
+			}
+
+		}
 
 
 	}
